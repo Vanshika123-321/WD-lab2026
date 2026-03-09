@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Scholarship / Seminar Registration Form</title>
+</head>
+
+<body>
+
+<h2>Scholarship / Seminar Registration Form</h2>
+
+<form>
+
+<fieldset>
+<legend>Personal Information</legend>
+
+<label>Full Name:</label><br>
+<input type="text" name="fullname"><br><br>
+
+<label>Email:</label><br>
+<input type="email" name="email"><br><br>
+
+<label>Phone Number:</label><br>
+<input type="tel" name="phone"><br><br>
+
+<label>Gender:</label><br>
+<input type="radio" name="gender" value="Male"> Male
+<input type="radio" name="gender" value="Female"> Female
+<input type="radio" name="gender" value="Other"> Other
+
+</fieldset>
+
+<br>
+
+<fieldset>
+<legend>Academic Details</legend>
+
+<label>Course:</label><br>
+<select name="course">
+<option value="">--Select Course--</option>
+<option value="BTech">B.Tech</option>
+<option value="BSc">B.Sc</option>
+<option value="BCA">BCA</option>
+<option value="MBA">MBA</option>
+</select>
+
+<br><br>
+
+<label>Year of Study:</label><br>
+<select name="year">
+<option>1st Year</option>
+<option>2nd Year</option>
+<option>3rd Year</option>
+<option>Final Year</option>
+</select>
+
+</fieldset>
+
+<br>
+
+<fieldset>
+<legend>Seminar / Scholarship Options</legend>
+
+<label>Type:</label><br>
+<input type="radio" name="type" value="Scholarship"> Scholarship
+<input type="radio" name="type" value="Seminar"> Seminar
+
+<br><br>
+
+<label>Areas of Interest:</label><br>
+<input type="checkbox" name="interest" value="Technology"> Technology<br>
+<input type="checkbox" name="interest" value="Research"> Research<br>
+<input type="checkbox" name="interest" value="Entrepreneurship"> Entrepreneurship<br>
+<input type="checkbox" name="interest" value="Innovation"> Innovation
+
+</fieldset>
+
+<br>
+
+<input type="submit" value="Register">
+<input type="reset" value="Clear">
+
+</form>
+
+</body>
+</html>
