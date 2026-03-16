@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tribute Page</title>
+
+    <!-- Internal CSS -->
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            margin:0;
+            background-color:#f4f4f4;
+        }
+
+        /* Navigation Bar */
+        nav{
+            background-color:#333;
+            padding:10px;
+            text-align:center;
+        }
+
+        nav a{
+            color:white;
+            text-decoration:none;
+            margin:15px;
+            font-size:18px;
+            font-weight:bold;
+        }
+
+        nav a:hover{
+            color:yellow;
+        }
+
+        /* Header Section */
+        header{
+            background-color:#222;
+            color:white;
+            text-align:center;
+            padding:40px;
+        }
+
+        /* Main Layout */
+        .container{
+            width:80%;
+            margin:auto;
+            margin-top:20px;
+            display:flex;
+            gap:20px;
+        }
+
+        /* Image Section */
+        .image-box{
+            flex:1;
+            text-align:center;
+            border:2px solid #333;
+            padding:15px;
+            background:white;
+        }
+
+        .image-box img{
+            width:100%;
+            border-radius:10px;
+        }
+
+        /* Content Section */
+        .content{
+            flex:2;
+            border:2px solid #333;
+            padding:20px;
+            background:white;
+        }
+
+        h2{
+            border-bottom:2px solid #333;
+            padding-bottom:5px;
+        }
+
+        /* Footer */
+        footer{
+            text-align:center;
+            background:#333;
+            color:white;
+            padding:15px;
+            margin-top:20px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- Navigation Bar -->
+<nav>
+    <a href="#">Home</a>
+    <a href="#">Biography</a>
+    <a href="#">Movements</a>
+    <a href="#">Contact</a>
+</nav>
+
+<!-- Header -->
+<header>
+    <h1>Mahatma Gandhi</h1>
+    <p>Father of the Nation</p>
+</header>
+
+<!-- Main Content Layout -->
+<div class="container">
+
+    <!-- Image -->
+    <div class="image-box">
+        <img src="data:image/jpeg;base64,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" alt="Mahatma Gandhi">
+        <p>Leader of Indian Independence Movement</p>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="content">
+        <h2>Biography</h2>
+        <p>
+            Mahatma Gandhi was a great leader of India's freedom struggle 
+            against British rule. He believed in the principles of truth 
+            and non-violence (Ahimsa) and inspired millions of people to 
+            join the movement for independence.
+        </p>
+
+        <h2>Major Movements</h2>
+        <ul>
+            <li>Non-Cooperation Movement (1920)</li>
+            <li>Civil Disobedience Movement (1930)</li>
+            <li>Dandi Salt March</li>
+            <li>Quit India Movement (1942)</li>
+        </ul>
+
+        <h2>Legacy</h2>
+        <p>
+            Mahatma Gandhi's philosophy of peace, truth, and non-violence 
+            influenced not only India but also many leaders across the 
+            world. His teachings continue to inspire people to follow the 
+            path of justice and harmony.
+        </p>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>Tribute Page | Created using HTML & Internal CSS</p>
+</footer>
+
+</body>
+</html>
