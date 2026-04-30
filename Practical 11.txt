@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 APIs Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --bg-elevated: #12121e;
+      --card: #181830;
+      --card-hover: #1e1e3a;
+      --border: #2a2a4a;
+      --fg: #e4e4f0;
+      --fg-muted: #8888aa;
+      --accent: #f97316;
+      --accent-glow: rgba(249, 115, 22, 0.25);
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.2);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.2);
+      --rose: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.2);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Animated background */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; overflow: hidden;
+    }
+    .bg-layer .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(100px); opacity: 0.35;
+      animation: orbFloat 18s ease-in-out infinite alternate;
+    }
+    .bg-layer .orb:nth-child(1) { width: 500px; height: 500px; background: var(--accent); top: -10%; left: -5%; }
+    .bg-layer .orb:nth-child(2) { width: 400px; height: 400px; background: var(--cyan); bottom: -10%; right: -5%; animation-delay: -6s; }
+    .bg-layer .orb:nth-child(3) { width: 350px; height: 350px; background: var(--emerald); top: 50%; left: 40%; animation-delay: -12s; }
+    @keyframes orbFloat {
+      0% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(40px,-30px) scale(1.08); }
+      66% { transform: translate(-20px,50px) scale(0.95); }
+      100% { transform: translate(30px,20px) scale(1.03); }
+    }
+    .bg-layer::after {
+      content: ''; position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M60 0H0v60' fill='none' stroke='%23ffffff' stroke-width='0.3' opacity='0.04'/%3E%3C/pattern%3E%3C/defs%3E%3Crect fill='url(%23g)' width='60' height='60'/%3E%3C/svg%3E");
+    }
+    .content-wrapper { position: relative; z-index: 1; }
+
+    /* Header */
+    header { padding: 2rem 2rem 0; text-align: center; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; background: var(--accent-glow);
+      border: 1px solid rgba(249,115,22,0.3); border-radius: 100px;
+      font-size: 0.75rem; font-weight: 600; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 1.2rem;
+      animation: fadeInDown 0.6s ease-out;
+    }
+    .badge i { font-size: 0.65rem; }
+    header h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 700;
+      letter-spacing: -1.5px; line-height: 1.15;
+      animation: fadeInDown 0.6s ease-out 0.1s both;
+    }
+    header h1 .highlight { color: var(--accent); }
+    header p {
+      color: var(--fg-muted); font-size: 1.05rem;
+      max-width: 560px; margin: 1rem auto 0;
+      animation: fadeInDown 0.6s ease-out 0.2s both;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tabs */
+    .tab-nav {
+      display: flex; justify-content: center; gap: 8px;
+      padding: 2rem 1rem; flex-wrap: wrap;
+      animation: fadeInDown 0.6s ease-out 0.3s both;
+    }
+    .tab-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border: 1px solid var(--border);
+      border-radius: 100px; background: var(--bg-elevated);
+      color: var(--fg-muted); font-family: inherit;
+      font-size: 0.88rem; font-weight: 500; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tab-btn:hover { border-color: var(--fg-muted); color: var(--fg); background: var(--card); }
+    .tab-btn.active {
+      border-color: var(--accent); color: var(--accent);
+      background: var(--accent-glow); box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .tab-btn i { font-size: 0.85rem; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+    .api-section { display: none; animation: sectionIn 0.45s ease-out; }
+    .api-section.visible { display: block; }
+    @keyframes sectionIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 1.5rem; }
+    .section-icon {
+      width: 48px; height: 48px; border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .section-icon.orange { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(249,115,22,0.25); }
+    .section-icon.cyan { background: var(--cyan-glow); color: var(--cyan); border: 1px solid rgba(6,182,212,0.25); }
+    .section-icon.emerald { background: var(--emerald-glow); color: var(--emerald); border: 1px solid rgba(16,185,129,0.25); }
+    .section-header h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+    .section-header p { color: var(--fg-muted); font-size: 0.88rem; margin-top: 2px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      transition: border-color 0.3s;
+    }
+    .card:hover { border-color: rgba(255,255,255,0.1); }
+
+    /* ===== DRAG & DROP ===== */
+    .dnd-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media (max-width: 700px) { .dnd-board { grid-template-columns: 1fr; } }
+    .dnd-column {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius); min-height: 320px;
+      display: flex; flex-direction: column;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .dnd-column.drag-over {
+      border-color: var(--accent);
+      box-shadow: 0 0 24px var(--accent-glow), inset 0 0 20px var(--accent-glow);
+    }
+    .col-header {
+      padding: 1rem 1.2rem 0.8rem; display: flex;
+      align-items: center; gap: 10px; font-weight: 600; font-size: 0.9rem;
+    }
+    .col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .col-dot.orange { background: var(--accent); }
+    .col-dot.cyan { background: var(--cyan); }
+    .col-dot.emerald { background: var(--emerald); }
+    .col-count {
+      margin-left: auto; background: var(--card); padding: 2px 10px;
+      border-radius: 100px; font-size: 0.75rem; color: var(--fg-muted);
+    }
+    .col-body {
+      padding: 0.5rem 0.8rem 1rem; flex: 1;
+      display: flex; flex-direction: column; gap: 8px; overflow-y: auto;
+    }
+    .dnd-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.9rem 1rem;
+      cursor: grab; transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+    .dnd-item:active { cursor: grabbing; }
+    .dnd-item:hover {
+      transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      border-color: rgba(255,255,255,0.1);
+    }
+    .dnd-item.dragging { opacity: 0.4; transform: scale(0.96); }
+    .dnd-item .item-title { font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; }
+    .dnd-item .item-desc { font-size: 0.78rem; color: var(--fg-muted); line-height: 1.4; }
+    .dnd-item .item-tag {
+      display: inline-block; margin-top: 8px; padding: 2px 8px;
+      border-radius: 4px; font-size: 0.68rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .tag-design { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .tag-dev { background: var(--cyan-glow); color: var(--cyan); }
+    .tag-bug { background: var(--rose-glow); color: var(--rose); }
+    .tag-feature { background: var(--emerald-glow); color: var(--emerald); }
+    .tag-urgent { background: var(--accent-glow); color: var(--accent); }
+    .add-item-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 0.6rem; margin: 0.3rem 0.8rem 0.8rem;
+      border: 1px dashed var(--border); border-radius: var(--radius-sm);
+      background: transparent; color: var(--fg-muted); font-family: inherit;
+      font-size: 0.8rem; cursor: pointer; transition: all 0.25s;
+    }
+    .add-item-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+    /* ===== GEOLOCATION ===== */
+    .geo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .geo-grid { grid-template-columns: 1fr; } }
+    .geo-map-container {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      position: relative; aspect-ratio: 1; max-height: 400px;
+    }
+    .geo-map-container canvas { width: 100%; height: 100%; display: block; }
+    .geo-map-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0.8rem;
+      background: rgba(11,11,18,0.65); backdrop-filter: blur(4px);
+      transition: opacity 0.4s; padding: 2rem; text-align: center;
+    }
+    .geo-map-overlay.hidden { opacity: 0; pointer-events: none; }
+    .geo-map-overlay i { font-size: 2.2rem; color: var(--fg-muted); }
+    .geo-map-overlay span { color: var(--fg-muted); font-size: 0.88rem; line-height: 1.5; }
+    .geo-map-overlay .overlay-sub { font-size: 0.78rem; color: rgba(136,136,170,0.7); }
+
+    .geo-info { display: flex; flex-direction: column; gap: 1rem; }
+    .geo-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 14px 28px; border: none; border-radius: var(--radius);
+      font-family: inherit; font-size: 0.92rem; font-weight: 600;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .geo-btn.primary {
+      background: linear-gradient(135deg, var(--cyan), #0891b2);
+      color: #fff; box-shadow: 0 4px 20px var(--cyan-glow);
+    }
+    .geo-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--cyan-glow); }
+    .geo-btn.primary:active { transform: scale(0.97); }
+    .geo-btn.primary.demo-mode {
+      background: linear-gradient(135deg, var(--accent), #ea580c);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .geo-btn.primary.demo-mode:hover { box-shadow: 0 8px 30px var(--accent-glow); }
+    .geo-stat {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1rem 1.2rem;
+    }
+    .geo-stat-label {
+      font-size: 0.72rem; color: var(--fg-muted);
+      text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 6px;
+    }
+    .geo-stat-value {
+      font-family: 'JetBrains Mono', monospace; font-size: 1.15rem;
+      font-weight: 500; color: var(--fg);
+    }
+    .geo-stat-value.placeholder { color: var(--fg-muted); font-size: 0.9rem; }
+    .geo-stat-value.demo-val { color: var(--accent); }
+    .geo-watch-row { display: flex; gap: 8px; }
+    .geo-btn.secondary {
+      background: var(--card); color: var(--fg-muted);
+      border: 1px solid var(--border); flex: 1; padding: 10px 16px; font-size: 0.82rem;
+    }
+    .geo-btn.secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+    .geo-btn.secondary.active-watch { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-glow); }
+    .geo-btn.secondary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Permission guide box */
+    .perm-guide {
+      background: rgba(249,115,22,0.06); border: 1px solid rgba(249,115,22,0.2);
+      border-radius: var(--radius-sm); padding: 1rem 1.2rem; margin-top: 0.5rem;
+    }
+    .perm-guide-title {
+      font-size: 0.78rem; font-weight: 600; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 0.5rem;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .perm-guide ol {
+      padding-left: 1.2rem; font-size: 0.8rem; color: var(--fg-muted);
+      line-height: 1.7;
+    }
+    .perm-guide ol li::marker { color: var(--accent); }
+    .perm-guide code {
+      background: var(--card); padding: 1px 6px; border-radius: 3px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--cyan);
+    }
+
+    /* ===== WEB STORAGE ===== */
+    .storage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .storage-grid { grid-template-columns: 1fr; } }
+    .storage-panel-title {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 600; font-size: 0.95rem; margin-bottom: 1rem;
+    }
+    .storage-panel-title i { font-size: 0.85rem; }
+    .storage-panel-title .storage-type {
+      margin-left: auto; padding: 2px 10px; border-radius: 4px;
+      font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; font-weight: 600;
+    }
+    .type-local { background: var(--emerald-glow); color: var(--emerald); }
+    .type-session { background: var(--accent-glow); color: var(--accent); }
+    .note-input-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+    .note-input {
+      flex: 1; padding: 10px 14px; background: var(--bg-elevated);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--fg); font-family: inherit; font-size: 0.88rem;
+      outline: none; transition: border-color 0.25s;
+    }
+    .note-input:focus { border-color: var(--emerald); }
+    .note-input::placeholder { color: var(--fg-muted); }
+    .save-btn {
+      padding: 10px 18px; background: var(--emerald); color: #fff;
+      border: none; border-radius: var(--radius-sm); font-family: inherit;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: all 0.25s; white-space: nowrap;
+    }
+    .save-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .save-btn.orange-save { background: var(--accent); }
+    .save-btn.orange-save:hover { filter: brightness(1.15); }
+    .notes-list {
+      display: flex; flex-direction: column; gap: 8px;
+      max-height: 280px; overflow-y: auto; padding-right: 4px;
+    }
+    .notes-list::-webkit-scrollbar { width: 4px; }
+    .notes-list::-webkit-scrollbar-track { background: transparent; }
+    .notes-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .note-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 0.8rem 1rem; background: var(--bg-elevated);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      animation: noteIn 0.3s ease-out;
+    }
+    @keyframes noteIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .note-item .note-text { flex: 1; font-size: 0.85rem; line-height: 1.4; word-break: break-word; }
+    .note-item .note-time {
+      font-size: 0.68rem; color: var(--fg-muted);
+      font-family: 'JetBrains Mono', monospace; margin-top: 4px;
+    }
+    .note-delete {
+      background: none; border: none; color: var(--fg-muted);
+      cursor: pointer; padding: 4px; font-size: 0.8rem; transition: color 0.2s; flex-shrink: 0;
+    }
+    .note-delete:hover { color: var(--rose); }
+    .storage-actions { display: flex; gap: 8px; margin-top: 1rem; }
+    .storage-action-btn {
+      flex: 1; padding: 8px 12px; background: var(--bg-elevated);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--fg-muted); font-family: inherit; font-size: 0.78rem;
+      cursor: pointer; transition: all 0.25s;
+    }
+    .storage-action-btn:hover { border-color: var(--rose); color: var(--rose); }
+    .storage-action-btn.danger:hover { background: var(--rose-glow); }
+    .empty-state {
+      text-align: center; padding: 2rem 1rem; color: var(--fg-muted); font-size: 0.85rem;
+    }
+    .empty-state i { font-size: 1.6rem; margin-bottom: 0.6rem; display: block; opacity: 0.4; }
+    .storage-inspector {
+      margin-top: 1rem; background: var(--bg-elevated);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 1rem 1.2rem;
+    }
+    .inspector-title {
+      font-size: 0.75rem; color: var(--fg-muted); text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 600; margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .inspector-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.82rem;
+    }
+    .inspector-row:last-child { border-bottom: none; }
+    .inspector-key { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+    .inspector-val {
+      color: var(--fg-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+      max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      display: flex; flex-direction: column-reverse; gap: 8px;
+    }
+    .toast {
+      padding: 12px 20px; border-radius: var(--radius-sm);
+      font-size: 0.85rem; font-weight: 500; color: #fff;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      animation: toastIn 0.35s ease-out;
+      display: flex; align-items: center; gap: 8px; max-width: 380px;
+    }
+    .toast.success { background: linear-gradient(135deg, #059669, #10b981); }
+    .toast.error { background: linear-gradient(135deg, #dc2626, #f43f5e); }
+    .toast.info { background: linear-gradient(135deg, #0284c7, #06b6d4); }
+    .toast.warning { background: linear-gradient(135deg, #d97706, #f97316); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .toast.removing { animation: toastOut 0.3s ease-in forwards; }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(30px); } }
+
+    footer { text-align: center; padding: 2rem 1rem 3rem; color: var(--fg-muted); font-size: 0.78rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-layer" aria-hidden="true">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <div class="content-wrapper">
+    <header>
+      <div class="badge"><i class="fas fa-bolt"></i> Interactive API Playground</div>
+      <h1>Explore <span class="highlight">HTML5 APIs</span></h1>
+      <p>Hands-on demos of Drag & Drop, Geolocation, and Web Storage — running natively in your browser.</p>
+    </header>
+
+    <nav class="tab-nav" role="tablist" aria-label="API sections">
+      <button class="tab-btn active" role="tab" aria-selected="true" data-tab="dnd">
+        <i class="fas fa-grip-vertical"></i> Drag & Drop
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="geo">
+        <i class="fas fa-location-crosshairs"></i> Geolocation
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="storage">
+        <i class="fas fa-database"></i> Web Storage
+      </button>
+    </nav>
+
+    <main>
+
+      <!-- DRAG & DROP -->
+      <section class="api-section visible" id="section-dnd" role="tabpanel" aria-label="Drag and Drop">
+        <div class="section-header">
+          <div class="section-icon orange"><i class="fas fa-arrows-alt"></i></div>
+          <div>
+            <h2>Drag & Drop API</h2>
+            <p>Drag task cards between columns to reorganize your workflow</p>
+          </div>
+        </div>
+        <div class="dnd-board" id="dnd-board">
+          <div class="dnd-column" data-column="backlog">
+            <div class="col-header">
+              <span class="col-dot orange"></span> Backlog
+              <span class="col-count" id="count-backlog">3</span>
+            </div>
+            <div class="col-body" data-column="backlog">
+              <div class="dnd-item" draggable="true" data-id="1">
+                <div class="item-title">Redesign landing page</div>
+                <div class="item-desc">Update hero section with new brand guidelines and illustrations</div>
+                <span class="item-tag tag-design">Design</span>
+              </div>
+              <div class="dnd-item" draggable="true" data-id="2">
+                <div class="item-title">Fix pagination bug</div>
+                <div class="item-desc">Items beyond page 3 return 404 on filtered views</div>
+                <span class="item-tag tag-bug">Bug</span>
+              </div>
+              <div class="dnd-item" draggable="true" data-id="3">
+                <div class="item-title">Dark mode toggle</div>
+                <div class="item-desc">Implement system-preference-aware theme switcher</div>
+                <span class="item-tag tag-feature">Feature</span>
+              </div>
+            </div>
+            <button class="add-item-btn" data-add="backlog"><i class="fas fa-plus"></i> Add card</button>
+          </div>
+          <div class="dnd-column" data-column="progress">
+            <div class="col-header">
+              <span class="col-dot cyan"></span> In Progress
+              <span class="col-count" id="count-progress">2</span>
+            </div>
+            <div class="col-body" data-column="progress">
+              <div class="dnd-item" draggable="true" data-id="4">
+                <div class="item-title">API rate limiter</div>
+                <div class="item-desc">Add token bucket algorithm for public endpoints</div>
+                <span class="item-tag tag-dev">Backend</span>
+              </div>
+              <div class="dnd-item" draggable="true" data-id="5">
+                <div class="item-title">Mobile nav refactor</div>
+                <div class="item-desc">Bottom sheet navigation with swipe gestures</div>
+                <span class="item-tag tag-design">Design</span>
+              </div>
+            </div>
+            <button class="add-item-btn" data-add="progress"><i class="fas fa-plus"></i> Add card</button>
+          </div>
+          <div class="dnd-column" data-column="done">
+            <div class="col-header">
+              <span class="col-dot emerald"></span> Done
+              <span class="col-count" id="count-done">1</span>
+            </div>
+            <div class="col-body" data-column="done">
+              <div class="dnd-item" draggable="true" data-id="6">
+                <div class="item-title">Setup CI/CD pipeline</div>
+                <div class="item-desc">GitHub Actions with staging and production deployments</div>
+                <span class="item-tag tag-dev">Backend</span>
+              </div>
+            </div>
+            <button class="add-item-btn" data-add="done"><i class="fas fa-plus"></i> Add card</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- GEOLOCATION -->
+      <section class="api-section" id="section-geo" role="tabpanel" aria-label="Geolocation">
+        <div class="section-header">
+          <div class="section-icon cyan"><i class="fas fa-map-marker-alt"></i></div>
+          <div>
+            <h2>Geolocation API</h2>
+            <p>Get your real-time coordinates with fallback demo mode</p>
+          </div>
+        </div>
+        <div class="geo-grid">
+          <div class="geo-map-container">
+            <canvas id="geo-canvas"></canvas>
+            <div class="geo-map-overlay" id="geo-overlay">
+              <i class="fas fa-satellite-dish"></i>
+              <span id="geo-overlay-text">Click the button to locate yourself</span>
+              <span class="overlay-sub" id="geo-overlay-sub">Requires HTTPS or localhost</span>
+            </div>
+          </div>
+          <div class="geo-info">
+            <button class="geo-btn primary" id="geo-locate-btn">
+              <i class="fas fa-crosshairs"></i> Get My Location
+            </button>
+            <div class="geo-watch-row">
+              <button class="geo-btn secondary" id="geo-watch-btn">
+                <i class="fas fa-eye"></i> Watch
+              </button>
+              <button class="geo-btn secondary" id="geo-stop-btn" disabled>
+                <i class="fas fa-stop"></i> Stop
+              </button>
+            </div>
+            <div class="geo-stat">
+              <div class="geo-stat-label">Latitude</div>
+              <div class="geo-stat-value placeholder" id="geo-lat">--</div>
+            </div>
+            <div class="geo-stat">
+              <div class="geo-stat-label">Longitude</div>
+              <div class="geo-stat-value placeholder" id="geo-lng">--</div>
+            </div>
+            <div class="geo-stat">
+              <div class="geo-stat-label">Accuracy</div>
+              <div class="geo-stat-value placeholder" id="geo-acc">--</div>
+            </div>
+            <div class="geo-stat">
+              <div class="geo-stat-label">Timestamp</div>
+              <div class="geo-stat-value placeholder" id="geo-time">--</div>
+            </div>
+            <!-- Permission guide (hidden by default) -->
+            <div class="perm-guide" id="perm-guide" style="display:none;">
+              <div class="perm-guide-title"><i class="fas fa-lock-open"></i> How to enable location</div>
+              <ol>
+                <li>Click the <strong>lock / info icon</strong> in the address bar</li>
+                <li>Find <strong>Location</strong> and change it to <strong>Allow</strong></li>
+                <li>Reload the page and try again</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WEB STORAGE -->
+      <section class="api-section" id="section-storage" role="tabpanel" aria-label="Web Storage">
+        <div class="section-header">
+          <div class="section-icon emerald"><i class="fas fa-hard-drive"></i></div>
+          <div>
+            <h2>Web Storage API</h2>
+            <p>Save notes to localStorage (persistent) and sessionStorage (tab-scoped)</p>
+          </div>
+        </div>
+        <div class="storage-grid">
+          <div class="card">
+            <div class="storage-panel-title">
+              <i class="fas fa-floppy-disk" style="color: var(--emerald)"></i>
+              Persistent Notes
+              <span class="storage-type type-local">localStorage</span>
+            </div>
+            <div class="note-input-row">
+              <input type="text" class="note-input" id="local-input" placeholder="Write a persistent note..." maxlength="200" aria-label="Local storage note input">
+              <button class="save-btn" id="local-save-btn">Save</button>
+            </div>
+            <div class="notes-list" id="local-notes-list"></div>
+            <div class="storage-actions">
+              <button class="storage-action-btn danger" id="local-clear-btn"><i class="fas fa-trash-can"></i> Clear All</button>
+              <button class="storage-action-btn" id="local-export-btn"><i class="fas fa-download"></i> Export</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="storage-panel-title">
+              <i class="fas fa-clock" style="color: var(--accent)"></i>
+              Session Notes
+              <span class="storage-type type-session">sessionStorage</span>
+            </div>
+            <div class="note-input-row">
+              <input type="text" class="note-input" id="session-input" placeholder="Write a session note..." maxlength="200" aria-label="Session storage note input">
+              <button class="save-btn orange-save" id="session-save-btn">Save</button>
+            </div>
+            <div class="notes-list" id="session-notes-list"></div>
+            <div class="storage-actions">
+              <button class="storage-action-btn danger" id="session-clear-btn"><i class="fas fa-trash-can"></i> Clear All</button>
+              <button class="storage-action-btn" id="session-export-btn"><i class="fas fa-download"></i> Export</button>
+            </div>
+          </div>
+        </div>
+        <div class="storage-inspector" id="storage-inspector">
+          <div class="inspector-title"><i class="fas fa-search"></i> Storage Inspector</div>
+          <div id="inspector-entries"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>Built with native HTML5 APIs — no frameworks, no dependencies, no build tools.</footer>
+  </div>
+
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <script>
+    /* ============================================
+       TOAST SYSTEM
+    ============================================ */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      const icons = {
+        success: 'fa-check-circle', error: 'fa-circle-xmark',
+        info: 'fa-circle-info', warning: 'fa-triangle-exclamation'
+      };
+      toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('removing');
+        toast.addEventListener('animationend', () => toast.remove());
+      }, 3200);
+    }
+
+    /* ============================================
+       TAB NAVIGATION
+    ============================================ */
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.api-section');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        sections.forEach(s => s.classList.remove('visible'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById(`section-${btn.dataset.tab}`).classList.add('visible');
+        if (btn.dataset.tab === 'geo') resizeGeoCanvas();
+      });
+    });
+
+    /* ============================================
+       DRAG & DROP API
+    ============================================ */
+    const board = document.getElementById('dnd-board');
+    let draggedItem = null;
+
+    board.addEventListener('dragstart', (e) => {
+      const item = e.target.closest('.dnd-item');
+      if (!item) return;
+      draggedItem = item;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      const ghost = item.cloneNode(true);
+      ghost.style.opacity = '0.7';
+      ghost.style.position = 'absolute';
+      ghost.style.top = '-9999px';
+      document.body.appendChild(ghost);
+      e.dataTransfer.setDragImage(ghost, 20, 20);
+      requestAnimationFrame(() => document.body.removeChild(ghost));
+    });
+
+    board.addEventListener('dragend', (e) => {
+      const item = e.target.closest('.dnd-item');
+      if (item) item.classList.remove('dragging');
+      draggedItem = null;
+      document.querySelectorAll('.dnd-column').forEach(c => c.classList.remove('drag-over'));
+    });
+
+    document.querySelectorAll('.dnd-column').forEach(column => {
+      column.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        column.classList.add('drag-over');
+      });
+      column.addEventListener('dragleave', (e) => {
+        if (!column.contains(e.relatedTarget)) column.classList.remove('drag-over');
+      });
+      column.addEventListener('drop', (e) => {
+        e.preventDefault();
+        column.classList.remove('drag-over');
+        if (!draggedItem) return;
+        const targetBody = column.querySelector('.col-body');
+        const afterElement = getDragAfterElement(targetBody, e.clientY);
+        if (afterElement) {
+          targetBody.insertBefore(draggedItem, afterElement);
+        } else {
+          targetBody.appendChild(draggedItem);
+        }
+        updateColumnCounts();
+        const labels = { backlog: 'Backlog', progress: 'In Progress', done: 'Done' };
+        showToast(`Moved to ${labels[column.dataset.column]}`, 'success');
+      });
+    });
+
+    function getDragAfterElement(container, y) {
+      const items = [...container.querySelectorAll('.dnd-item:not(.dragging)')];
+      return items.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) return { offset, element: child };
+        return closest;
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function updateColumnCounts() {
+      ['backlog', 'progress', 'done'].forEach(col => {
+        const count = document.querySelector(`.col-body[data-column="${col}"]`).children.length;
+        document.getElementById(`count-${col}`).textContent = count;
+      });
+    }
+
+    // Add new cards
+    const cardTemplates = [
+      { title: 'Optimize image loading', desc: 'Implement lazy loading and WebP conversion pipeline', tag: 'dev', tagLabel: 'Backend' },
+      { title: 'Accessibility audit', desc: 'Run WCAG 2.1 AA compliance checks on all pages', tag: 'feature', tagLabel: 'Feature' },
+      { title: 'Fix color contrast', desc: 'Sidebar text fails contrast ratio on dark backgrounds', tag: 'bug', tagLabel: 'Bug' },
+      { title: 'New onboarding flow', desc: 'Step-by-step wizard for first-time users', tag: 'design', tagLabel: 'Design' },
+      { title: 'Cache invalidation', desc: 'Stale data showing on dashboard after updates', tag: 'urgent', tagLabel: 'Urgent' },
+      { title: 'Unit test coverage', desc: 'Increase coverage from 42% to 80% on core modules', tag: 'dev', tagLabel: 'Backend' },
+      { title: 'Analytics integration', desc: 'Add event tracking for key user interactions', tag: 'feature', tagLabel: 'Feature' },
+    ];
+    let cardIndex = 7;
+
+    document.querySelectorAll('.add-item-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tmpl = cardTemplates[Math.floor(Math.random() * cardTemplates.length)];
+        const body = document.querySelector(`.col-body[data-column="${btn.dataset.add}"]`);
+        const item = document.createElement('div');
+        item.className = 'dnd-item';
+        item.draggable = true;
+        item.dataset.id = cardIndex++;
+        item.innerHTML = `<div class="item-title">${tmpl.title}</div><div class="item-desc">${tmpl.desc}</div><span class="item-tag tag-${tmpl.tag}">${tmpl.tagLabel}</span>`;
+        body.appendChild(item);
+        updateColumnCounts();
+        showToast('New card added', 'info');
+      });
+    });
+
+    /* ============================================
+       GEOLOCATION API — WITH PERMISSION HANDLING
+       & DEMO MODE FALLBACK
+    ============================================ */
+    const geoCanvas = document.getElementById('geo-canvas');
+    const geoCtx = geoCanvas.getContext('2d');
+    const geoOverlay = document.getElementById('geo-overlay');
+    const geoOverlayText = document.getElementById('geo-overlay-text');
+    const geoOverlaySub = document.getElementById('geo-overlay-sub');
+    const permGuide = document.getElementById('perm-guide');
+    let geoAnimFrame = null;
+    let geoData = null;
+    let isDemoMode = false;
+    let watchId = null;
+    let radarAngle = 0;
+    let geoParticles = [];
+    let demoInterval = null;
+
+    function resizeGeoCanvas() {
+      const container = geoCanvas.parentElement;
+      const rect = container.getBoundingClientRect();
+      geoCanvas.width = rect.width * window.devicePixelRatio;
+      geoCanvas.height = rect.height * window.devicePixelRatio;
+      geoCtx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      geoCanvas.style.width = rect.width + 'px';
+      geoCanvas.style.height = rect.height + 'px';
+    }
+    resizeGeoCanvas();
+    window.addEventListener('resize', resizeGeoCanvas);
+
+    /* --- Check prerequisites before asking --- */
+    function checkGeoPrerequisites() {
+      // 1. API exists?
+      if (!navigator.geolocation) {
+        return { ok: false, reason: 'unsupported' };
+      }
+      // 2. Secure context?
+      if (!window.isSecureContext) {
+        return { ok: false, reason: 'insecure' };
+      }
+      // 3. Check permission state via Permissions API (if available)
+      if (navigator.permissions) {
+        return navigator.permissions.query({ name: 'geolocation' }).then(result => {
+          if (result.state === 'denied') {
+            return { ok: false, reason: 'denied' };
+          }
+          return { ok: true, reason: result.state };
+        });
+      }
+      return { ok: true, reason: 'unknown' };
+    }
+
+    /* --- Show the right UI based on the problem --- */
+    function showGeoProblem(reason) {
+      permGuide.style.display = 'none';
+      geoOverlay.classList.remove('hidden');
+
+      if (reason === 'unsupported') {
+        geoOverlayText.textContent = 'Geolocation is not supported by your browser';
+        geoOverlaySub.textContent = 'Try using a modern browser like Chrome, Firefox, or Edge';
+      } else if (reason === 'insecure') {
+        geoOverlayText.textContent = 'Geolocation requires a secure connection';
+        geoOverlaySub.textContent = 'Open this page via HTTPS or localhost to enable it';
+        document.getElementById('geo-locate-btn').classList.add('demo-mode');
+        document.getElementById('geo-locate-btn').innerHTML = '<i class="fas fa-play"></i> Launch Demo Mode Instead';
+      } else if (reason === 'denied') {
+        geoOverlayText.textContent = 'Location permission was previously denied';
+        geoOverlaySub.textContent = 'Follow the steps below to re-enable it, or use Demo Mode';
+        permGuide.style.display = 'block';
+        document.getElementById('geo-locate-btn').classList.add('demo-mode');
+        document.getElementById('geo-locate-btn').innerHTML = '<i class="fas fa-play"></i> Launch Demo Mode Instead';
+      }
+    }
+
+    /* --- Real geolocation success handler --- */
+    function updateGeoDisplay(position, demo = false) {
+      geoData = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        acc: position.coords.accuracy,
+        time: new Date(position.timestamp),
+        demo: demo
+      };
+
+      const latEl = document.getElementById('geo-lat');
+      const lngEl = document.getElementById('geo-lng');
+      const accEl = document.getElementById('geo-acc');
+      const timeEl = document.getElementById('geo-time');
+
+      latEl.textContent = geoData.lat.toFixed(6);
+      latEl.className = 'geo-stat-value' + (demo ? ' demo-val' : '');
+      lngEl.textContent = geoData.lng.toFixed(6);
+      lngEl.className = 'geo-stat-value' + (demo ? ' demo-val' : '');
+      accEl.textContent = `${geoData.acc.toFixed(1)} meters`;
+      accEl.className = 'geo-stat-value' + (demo ? ' demo-val' : '');
+      timeEl.textContent = geoData.time.toLocaleTimeString();
+      timeEl.className = 'geo-stat-value' + (demo ? ' demo-val' : '');
+
+      geoOverlay.classList.add('hidden');
+    }
+
+    function geoError(err) {
+      const messages = {
+        1: 'Location permission denied by user.',
+        2: 'Position unavailable — device could not determine location.',
+        3: 'Location request timed out. Try again.'
+      };
+      showToast(messages[err.code] || 'Unknown geolocation error.', 'error');
+
+      if (err.code === 1) {
+        showGeoProblem('denied');
+      }
+    }
+
+    /* --- Start DEMO MODE (simulated coordinates) --- */
+    function startDemoMode() {
+      isDemoMode = true;
+      showToast('Demo Mode activated — using simulated coordinates', 'warning');
+
+      // Simulate a walk through a city (e.g., San Francisco)
+      const baseLat = 37.7749;
+      const baseLng = -122.4194;
+      let step = 0;
+
+      function demoTick() {
+        // Slowly drift coordinates to simulate movement
+        const lat = baseLat + Math.sin(step * 0.02) * 0.005 + (Math.random() - 0.5) * 0.0005;
+        const lng = baseLng + Math.cos(step * 0.015) * 0.005 + (Math.random() - 0.5) * 0.0005;
+
+        updateGeoDisplay({
+          coords: { latitude: lat, longitude: lng, accuracy: 8 + Math.random() * 30 },
+          timestamp: Date.now()
+        }, true);
+
+        step++;
+      }
+
+      demoTick();
+      demoInterval = setInterval(demoTick, 2000);
+    }
+
+    function stopDemoMode() {
+      isDemoMode = false;
+      if (demoInterval) { clearInterval(demoInterval); demoInterval = null; }
+    }
+
+    /* --- Main locate button logic --- */
+    const locateBtn = document.getElementById('geo-locate-btn');
+
+    locateBtn.addEventListener('click', () => {
+      // If already in demo mode and they click again, re-check
+      if (isDemoMode) {
+        stopDemoMode();
+        initGeoButton();
+        return;
+      }
+
+      checkGeoPrerequisites().then(result => {
+        if (!result.ok) {
+          // Problem detected — show guidance + offer demo mode
+          showGeoProblem(result.reason);
+          return;
+        }
+
+        // All clear — request real location
+        showToast('Requesting location access...', 'info');
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            updateGeoDisplay(pos, false);
+            showToast('Location acquired successfully', 'success');
+          },
+          geoError,
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
+      });
+    });
+
+    /* --- Watch / Stop --- */
+    document.getElementById('geo-watch-btn').addEventListener('click', () => {
+      if (isDemoMode) {
+        showToast('Already tracking in Demo Mode', 'info');
+        return;
+      }
+      if (watchId !== null) return;
+
+      checkGeoPrerequisites().then(result => {
+        if (!result.ok) {
+          showGeoProblem(result.reason);
+          return;
+        }
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            updateGeoDisplay(pos, false);
+            showToast('Position updated', 'success');
+          },
+          geoError,
+          { enableHighAccuracy: true, maximumAge: 2000 }
+        );
+        document.getElementById('geo-watch-btn').classList.add('active-watch');
+        document.getElementById('geo-watch-btn').innerHTML = '<i class="fas fa-eye"></i> Watching...';
+        document.getElementById('geo-stop-btn').disabled = false;
+        showToast('Continuously watching your position', 'info');
+      });
+    });
+
+    document.getElementById('geo-stop-btn').addEventListener('click', () => {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      stopDemoMode();
+      document.getElementById('geo-watch-btn').classList.remove('active-watch');
+      document.getElementById('geo-watch-btn').innerHTML = '<i class="fas fa-eye"></i> Watch';
+      document.getElementById('geo-stop-btn').disabled = true;
+      showToast('Stopped tracking', 'warning');
+    });
+
+    /* --- Initialize the geo button state on page load --- */
+    function initGeoButton() {
+      locateBtn.classList.remove('demo-mode');
+      locateBtn.innerHTML = '<i class="fas fa-crosshairs"></i> Get My Location';
+      permGuide.style.display = 'none';
+      geoOverlay.classList.remove('hidden');
+      geoOverlayText.textContent = 'Click the button to locate yourself';
+      geoOverlaySub.textContent = 'Requires HTTPS or localhost';
+
+      checkGeoPrerequisites().then(result => {
+        if (!result.ok) showGeoProblem(result.reason);
+      });
+    }
+    initGeoButton();
+
+    /* --- Radar Canvas Drawing --- */
+    function drawRadar() {
+      const w = geoCanvas.width / window.devicePixelRatio;
+      const h = geoCanvas.height / window.devicePixelRatio;
+      const cx = w / 2;
+      const cy = h / 2;
+      const maxR = Math.min(cx, cy) * 0.88;
+
+      geoCtx.clearRect(0, 0, w, h);
+
+      // Background
+      geoCtx.fillStyle = '#080810';
+      geoCtx.fillRect(0, 0, w, h);
+
+      // Concentric rings
+      for (let i = 1; i <= 4; i++) {
+        const r = Math.max(1, (maxR / 4) * i);
+        geoCtx.beginPath();
+        geoCtx.arc(cx, cy, r, 0, Math.PI * 2);
+        geoCtx.strokeStyle = `rgba(6, 182, 212, ${0.06 + i * 0.02})`;
+        geoCtx.lineWidth = 1;
+        geoCtx.stroke();
+      }
+
+      // Crosshairs
+      geoCtx.strokeStyle = 'rgba(6, 182, 212, 0.08)';
+      geoCtx.lineWidth = 1;
+      geoCtx.beginPath();
+      geoCtx.moveTo(cx - maxR, cy); geoCtx.lineTo(cx + maxR, cy);
+      geoCtx.moveTo(cx, cy - maxR); geoCtx.lineTo(cx, cy + maxR);
+      geoCtx.stroke();
+
+      // Diagonals
+      const diag = maxR * 0.707;
+      geoCtx.beginPath();
+      geoCtx.moveTo(cx - diag, cy - diag); geoCtx.lineTo(cx + diag, cy + diag);
+      geoCtx.moveTo(cx + diag, cy - diag); geoCtx.lineTo(cx - diag, cy + diag);
+      geoCtx.stroke();
+
+      // Sweep trail
+      radarAngle += 0.015;
+      for (let a = 0; a < 0.5; a += 0.02) {
+        const alpha = (0.5 - a) * 0.25;
+        geoCtx.beginPath();
+        geoCtx.moveTo(cx, cy);
+        geoCtx.arc(cx, cy, maxR, radarAngle - a, radarAngle - a + 0.025);
+        geoCtx.closePath();
+        geoCtx.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+        geoCtx.fill();
+      }
+
+      // Sweep line
+      geoCtx.beginPath();
+      geoCtx.moveTo(cx, cy);
+      geoCtx.lineTo(cx + Math.cos(radarAngle) * maxR, cy + Math.sin(radarAngle) * maxR);
+      geoCtx.strokeStyle = 'rgba(6, 182, 212, 0.7)';
+      geoCtx.lineWidth = 2;
+      geoCtx.stroke();
+
+      // Particles / blips
+      geoParticles.forEach(p => {
+        p.life -= 0.004;
+        if (p.life <= 0) return;
+        const px = cx + p.x * maxR;
+        const py = cy + p.y * maxR;
+        const size = Math.max(0.5, 3 * p.life);
+        geoCtx.beginPath();
+        geoCtx.arc(px, py, size, 0, Math.PI * 2);
+        const col = isDemoMode ? `rgba(249, 115, 22, ${p.life * 0.8})` : `rgba(6, 182, 212, ${p.life * 0.8})`;
+        geoCtx.fillStyle = col;
+        geoCtx.fill();
+      });
+      geoParticles = geoParticles.filter(p => p.life > 0);
+
+      // Location dot
+      if (geoData) {
+        const pulsePhase = (Date.now() % 2000) / 2000;
+        const pulseR = Math.max(1, 8 + pulsePhase * 22);
+        const dotColor = isDemoMode ? 'rgba(249, 115, 22,' : 'rgba(6, 182, 212,';
+        const dotSolid = isDemoMode ? '#f97316' : '#06b6d4';
+
+        // Outer pulse
+        geoCtx.beginPath();
+        geoCtx.arc(cx, cy, pulseR, 0, Math.PI * 2);
+        geoCtx.strokeStyle = `${dotColor} ${0.6 * (1 - pulsePhase)})`;
+        geoCtx.lineWidth = 2;
+        geoCtx.stroke();
+
+        // Second pulse ring
+        const pulse2 = ((Date.now() + 1000) % 2000) / 2000;
+        const pulse2R = Math.max(1, 8 + pulse2 * 22);
+        geoCtx.beginPath();
+        geoCtx.arc(cx, cy, pulse2R, 0, Math.PI * 2);
+        geoCtx.strokeStyle = `${dotColor} ${0.3 * (1 - pulse2)})`;
+        geoCtx.lineWidth = 1.5;
+        geoCtx.stroke();
+
+        // Center dot
+        geoCtx.beginPath();
+        geoCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+        geoCtx.fillStyle = dotSolid;
+        geoCtx.fill();
+        geoCtx.beginPath();
+        geoCtx.arc(cx, cy, 2.5, 0, Math.PI * 2);
+        geoCtx.fillStyle = '#fff';
+        geoCtx.fill();
+
+        // Coordinate text
+        geoCtx.font = '500 11px "JetBrains Mono", monospace';
+        geoCtx.fillStyle = isDemoMode ? 'rgba(249, 115, 22, 0.9)' : 'rgba(6, 182, 212, 0.9)';
+        geoCtx.textAlign = 'center';
+        geoCtx.fillText(`${geoData.lat.toFixed(5)}, ${geoData.lng.toFixed(5)}`, cx, cy + 28);
+        geoCtx.fillStyle = 'rgba(255,255,255,0.3)';
+        geoCtx.fillText(`ACC: ${geoData.acc.toFixed(0)}m`, cx, cy + 44);
+
+        if (isDemoMode) {
+          geoCtx.fillStyle = 'rgba(249, 115, 22, 0.5)';
+          geoCtx.font = '600 9px "Space Grotesk", sans-serif';
+          geoCtx.fillText('DEMO MODE', cx, cy - 18);
+        }
+
+        // Spawn blips
+        if (Math.random() < 0.04) {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 0.15 + Math.random() * 0.7;
+          geoParticles.push({ x: Math.cos(angle) * dist, y: Math.sin(angle) * dist, life: 1 });
+        }
+      }
+
+      // Outer ring
+      geoCtx.beginPath();
+      geoCtx.arc(cx, cy, maxR, 0, Math.PI * 2);
+      geoCtx.strokeStyle = isDemoMode ? 'rgba(249, 115, 22, 0.15)' : 'rgba(6, 182, 212, 0.15)';
+      geoCtx.lineWidth = 2;
+      geoCtx.stroke();
+
+      // Tick marks
+      for (let i = 0; i < 36; i++) {
+        const a = (i / 36) * Math.PI * 2;
+        const inner = i % 3 === 0 ? maxR - 10 : maxR - 5;
+        geoCtx.beginPath();
+        geoCtx.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner);
+        geoCtx.lineTo(cx + Math.cos(a) * maxR, cy + Math.sin(a) * maxR);
+        geoCtx.strokeStyle = isDemoMode ? 'rgba(249, 115, 22, 0.2)' : 'rgba(6, 182, 212, 0.2)';
+        geoCtx.lineWidth = i % 3 === 0 ? 2 : 1;
+        geoCtx.stroke();
+      }
+
+      geoAnimFrame = requestAnimationFrame(drawRadar);
+    }
+    drawRadar();
+
+    /* ============================================
+       WEB STORAGE API
+    ============================================ */
+    const STORAGE_KEYS = {
+      local: 'html5_demo_local_notes',
+      session: 'html5_demo_session_notes'
+    };
+
+    function getNotes(type) {
+      const storage = type === 'local' ? localStorage : sessionStorage;
+      try { return JSON.parse(storage.getItem(STORAGE_KEYS[type])) || []; }
+      catch { return []; }
+    }
+
+    function setNotes(type, notes) {
+      const storage = type === 'local' ? localStorage : sessionStorage;
+      storage.setItem(STORAGE_KEYS[type], JSON.stringify(notes));
+      renderNotes(type);
+      updateInspector();
+    }
+
+    function renderNotes(type) {
+      const list = document.getElementById(`${type}-notes-list`);
+      const notes = getNotes(type);
+      if (notes.length === 0) {
+        list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i>No notes saved yet</div>';
+        return;
+      }
+      list.innerHTML = notes.map((note, i) => `
+        <div class="note-item">
+          <div style="flex:1">
+            <div class="note-text">${escapeHtml(note.text)}</div>
+            <div class="note-time">${note.time}</div>
+          </div>
+          <button class="note-delete" data-type="${type}" data-index="${i}" aria-label="Delete note" title="Delete">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function addNote(type) {
+      const input = document.getElementById(`${type}-input`);
+      const text = input.value.trim();
+      if (!text) { showToast('Please type a note first', 'warning'); input.focus(); return; }
+      const notes = getNotes(type);
+      notes.unshift({ text, time: new Date().toLocaleString() });
+      setNotes(type, notes);
+      input.value = '';
+      input.focus();
+      showToast(`Note saved to ${type === 'local' ? 'localStorage' : 'sessionStorage'}`, 'success');
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.note-delete');
+      if (!btn) return;
+      const notes = getNotes(btn.dataset.type);
+      notes.splice(parseInt(btn.dataset.index), 1);
+      setNotes(btn.dataset.type, notes);
+      showToast('Note deleted', 'warning');
+    });
+
+    document.getElementById('local-save-btn').addEventListener('click', () => addNote('local'));
+    document.getElementById('session-save-btn').addEventListener('click', () => addNote('session'));
+    document.getElementById('local-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') addNote('local'); });
+    document.getElementById('session-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') addNote('session'); });
+
+    document.getElementById('local-clear-btn').addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEYS.local);
+      renderNotes('local'); updateInspector();
+      showToast('localStorage cleared', 'warning');
+    });
+    document.getElementById('session-clear-btn').addEventListener('click', () => {
+      sessionStorage.removeItem(STORAGE_KEYS.session);
+      renderNotes('session'); updateInspector();
+      showToast('sessionStorage cleared', 'warning');
+    });
+
+    document.getElementById('local-export-btn').addEventListener('click', () => exportNotes('local'));
+    document.getElementById('session-export-btn').addEventListener('click', () => exportNotes('session'));
+
+    function exportNotes(type) {
+      const notes = getNotes(type);
+      if (notes.length === 0) { showToast('Nothing to export', 'warning'); return; }
+      const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `${type}-notes-${Date.now()}.json`; a.click();
+      URL.revokeObjectURL(url);
+      showToast('Notes exported as JSON', 'success');
+    }
+
+    function updateInspector() {
+      const container = document.getElementById('inspector-entries');
+      const entries = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        entries.push({ key, value: localStorage.getItem(key), type: 'local' });
+      }
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        entries.push({ key, value: sessionStorage.getItem(key), type: 'session' });
+      }
+      if (entries.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding:0.5rem"><i class="fas fa-ghost"></i>No storage entries found</div>';
+        return;
+      }
+      container.innerHTML = entries.map(e => `
+        <div class="inspector-row">
+          <span class="inspector-key">${escapeHtml(e.key)}</span>
+          <span class="inspector-val">${escapeHtml(e.value.substring(0, 60))}${e.value.length > 60 ? '...' : ''}</span>
+        </div>
+      `).join('');
+    }
+
+    window.addEventListener('storage', () => { renderNotes('local'); updateInspector(); });
+
+    // Initial render
+    renderNotes('local');
+    renderNotes('session');
+    updateInspector();
+  </script>
+</body>
+</html>
