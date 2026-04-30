@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Space Exploration</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--bg:#0a0a0f;--card:rgba(255,255,255,0.04);--text:#f0ece4;--muted:#8a8690;--accent:#e8a849;--border:rgba(255,255,255,0.08);--radius:14px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+h1,h2,h3,h4,h5,h6{font-family:'Space Grotesk',sans-serif}
+.navbar{padding:18px 0;transition:all .3s}
+.navbar.scrolled{background:rgba(10,10,15,.85)!important;backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 0}
+.navbar-brand{font-weight:700;font-size:1.3rem;color:var(--text)!important;display:flex;align-items:center;gap:8px}
+.brand-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px rgba(232,168,73,.5)}
+.nav-link{color:var(--muted)!important;font-size:.88rem;font-weight:500;padding:6px 16px!important;border-radius:8px;transition:all .2s}
+.nav-link:hover,.nav-link.active{color:var(--text)!important;background:rgba(255,255,255,.06)}
+.btn-accent{background:linear-gradient(135deg,var(--accent),#c47f20);color:#0a0a0f;border:none;font-weight:600;border-radius:10px;padding:10px 24px;font-size:.9rem;transition:all .3s;box-shadow:0 4px 18px rgba(232,168,73,.25)}
+.btn-accent:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,168,73,.4);color:#0a0a0f}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.15);font-weight:500;border-radius:10px;padding:10px 24px;font-size:.9rem;transition:all .3s}
+.btn-ghost:hover{background:rgba(255,255,255,.06);border-color:var(--muted);color:var(--text);transform:translateY(-2px)}
+.carousel-item{height:90vh;min-height:520px;position:relative}
+.slide-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.slide-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,15,.25),rgba(10,10,15,.5) 40%,rgba(10,10,15,.92) 80%,var(--bg))}
+.slide-caption{position:absolute;bottom:0;left:0;right:0;padding:0 0 70px;z-index:2}
+.slide-tag{display:inline-block;background:rgba(232,168,73,.12);border:1px solid rgba(232,168,73,.25);color:var(--accent);padding:5px 14px;border-radius:50px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+.slide-caption h1{font-size:clamp(2rem,5vw,3.8rem);font-weight:700;line-height:1.08;letter-spacing:-.03em;margin-bottom:14px;max-width:650px}
+.slide-caption h1 .hl{background:linear-gradient(135deg,var(--accent),#f5ce7e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.slide-caption p{color:var(--muted);max-width:500px;font-size:1rem;line-height:1.6;margin-bottom:28px}
+.carousel-indicators [data-bs-target]{width:30px;height:3px;border-radius:3px;background:rgba(255,255,255,.2);border:none;opacity:1}
+.carousel-indicators .active{width:52px;background:var(--accent)}
+.carousel-control-prev,.carousel-control-next{width:46px;height:46px;top:50%;transform:translateY(-50%);bottom:auto;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;opacity:0;transition:.3s;margin:0 24px}
+.carousel:hover .carousel-control-prev,.carousel:hover .carousel-control-next{opacity:1}
+section{padding:80px 0}
+.stag{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.stag::before{content:'';width:20px;height:2px;background:var(--accent);border-radius:2px}
+.stitle{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;letter-spacing:-.02em;line-height:1.15;margin-bottom:12px}
+.sdesc{color:var(--muted);font-size:.95rem;max-width:500px;line-height:1.6}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;transition:.3s}
+.stat-box:hover{background:rgba(255,255,255,.06);transform:translateY(-3px)}
+.stat-num{font-size:2rem;font-weight:700;color:var(--accent);line-height:1}
+.stat-lbl{color:var(--muted);font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.mcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.35s;height:100%}
+.mcard:hover{background:rgba(255,255,255,.06);transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.3)}
+.mcard img{width:100%;height:200px;object-fit:cover;transition:transform .5s}
+.mcard:hover img{transform:scale(1.06)}
+.mcard-body{padding:20px}
+.mcard-date{font-size:.75rem;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.mcard-title{font-size:1.1rem;font-weight:600;margin-bottom:8px;line-height:1.3}
+.mcard-text{color:var(--muted);font-size:.85rem;line-height:1.6}
+.mcard-footer{padding:0 20px 18px;display:flex;align-items:center;justify-content:space-between}
+.status{font-size:.75rem;font-weight:600;display:flex;align-items:center;gap:5px}
+.status.on{color:#4ade80}.status.on::before{content:'';width:6px;height:6px;background:#4ade80;border-radius:50%;animation:pd 2s infinite}
+@keyframes pd{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.4)}50%{box-shadow:0 0 0 5px rgba(74,222,128,0)}}
+.status.done{color:var(--accent)}.status.done::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%}
+footer{background:#12121a;border-top:1px solid var(--border);padding:60px 0 0}
+footer h6{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;color:var(--text)}
+footer ul{list-style:none;padding:0}footer ul li{margin-bottom:10px}
+footer ul a{color:var(--muted);text-decoration:none;font-size:.85rem;transition:.2s}
+footer ul a:hover{color:var(--accent);transform:translateX(3px)}
+.fbottom{margin-top:40px;padding:20px 0;border-top:1px solid var(--border);color:var(--muted);font-size:.8rem}
+.toast-box{position:fixed;bottom:24px;right:24px;background:#1a1a24;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 22px;color:var(--text);font-size:.85rem;z-index:9999;transform:translateY(120%);opacity:0;transition:.35s;display:flex;align-items:center;gap:8px}
+.toast-box.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+<div class="container">
+  <a class="navbar-brand" href="#"><span class="brand-dot"></span>Cosmos</a>
+  <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navC" style="border:1px solid var(--border)"><span class="navbar-toggler-icon" style="filter:invert(.8)"></span></button>
+  <div class="collapse navbar-collapse" id="navC">
+    <ul class="navbar-nav mx-auto">
+      <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="#missions">Missions</a></li>
+      <li class="nav-item"><a class="nav-link" href="#discoveries">Discoveries</a></li>
+      <li class="nav-item"><a class="nav-link" href="#footer">Contact</a></li>
+    </ul>
+    <a href="#subscribe" class="btn btn-accent">Explore</a>
+  </div>
+</div>
+</nav>
+
+<!-- Carousel -->
+<div id="home" style="margin-top:-72px;padding-top:72px">
+<div id="heroC" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5500">
+  <div class="carousel-indicators">
+    <button data-bs-target="#heroC" data-bs-slide-to="0" class="active"></button>
+    <button data-bs-target="#heroC" data-bs-slide-to="1"></button>
+    <button data-bs-target="#heroC" data-bs-slide-to="2"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <div class="slide-bg" style="background-image:url('https://picsum.photos/seed/nebula-deep/1600/900.jpg')"></div>
+      <div class="slide-caption"><div class="container">
+        <span class="slide-tag">Featured Mission</span>
+        <h1>Beyond the <span class="hl">Oort Cloud</span></h1>
+        <p>Voyager 1 continues transmitting from interstellar space — 15 billion miles from Earth, the farthest human object ever.</p>
+        <div class="d-flex gap-3"><a href="#missions" class="btn btn-accent">Explore Missions</a><a href="#" class="btn btn-ghost" onclick="toast('Documentary loading...');return false">Watch Film</a></div>
+      </div></div>
+    </div>
+    <div class="carousel-item">
+      <div class="slide-bg" style="background-image:url('https://picsum.photos/seed/mars-landscape/1600/900.jpg')"></div>
+      <div class="slide-caption"><div class="container">
+        <span class="slide-tag">Red Planet</span>
+        <h1>The Road to <span class="hl">Mars</span></h1>
+        <p>From Perseverance to crewed missions, humanity is preparing for its boldest journey — walking on Martian soil.</p>
+        <div class="d-flex gap-3"><a href="#missions" class="btn btn-accent">View Mars Program</a><a href="#" class="btn btn-ghost" onclick="toast('3D Map opening...');return false">3D Map</a></div>
+      </div></div>
+    </div>
+    <div class="carousel-item">
+      <div class="slide-bg" style="background-image:url('https://picsum.photos/seed/galaxy-spiral/1600/900.jpg')"></div>
+      <div class="slide-caption"><div class="container">
+        <span class="slide-tag">James Webb</span>
+        <h1>Seeing the <span class="hl">First Light</span></h1>
+        <p>JWST reveals galaxies formed 300 million years after the Big Bang — rewriting cosmic history in real time.</p>
+        <div class="d-flex gap-3"><a href="#discoveries" class="btn btn-accent">See Discoveries</a><a href="#" class="btn btn-ghost" onclick="toast('Gallery loading...');return false">Gallery</a></div>
+      </div></div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" data-bs-target="#heroC" data-bs-slide="prev"><span class="carousel-control-prev-icon" style="filter:invert(.9)"></span></button>
+  <button class="carousel-control-next" data-bs-target="#heroC" data-bs-slide="next"><span class="carousel-control-next-icon" style="filter:invert(.9)"></span></button>
+</div>
+</div>
+
+<!-- Stats -->
+<section style="padding:0 0 60px;margin-top:-40px">
+<div class="container"><div class="row g-3">
+  <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-num">5,700+</div><div class="stat-lbl">Exoplanets Found</div></div></div>
+  <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-num">250+</div><div class="stat-lbl">Space Missions</div></div></div>
+  <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-num">15B+</div><div class="stat-lbl">Miles Reached</div></div></div>
+  <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-num">600+</div><div class="stat-lbl">Astronauts</div></div></div>
+</div></div>
+</section>
+
+<!-- Mission Cards -->
+<section id="missions">
+<div class="container">
+  <div class="row mb-4"><div class="col-lg-6"><div class="stag">Active Missions</div><h2 class="stitle">Pushing the Boundaries</h2></div><div class="col-lg-6 d-flex align-items-end justify-content-lg-end"><p class="sdesc mb-0">From Mars to the edge of the solar system, these missions define our era.</p></div></div>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4"><div class="mcard"><img src="https://picsum.photos/seed/jwst-space/600/440.jpg" alt="JWST"><div class="mcard-body"><div class="mcard-date"><i data-lucide="calendar" style="width:13px;height:13px"></i> Dec 2021</div><h5 class="mcard-title">James Webb Telescope</h5><p class="mcard-text">Peering into the universe's first galaxies with unprecedented infrared clarity.</p></div><div class="mcard-footer"><span class="status on">Operational</span><a href="#" class="btn btn-ghost" style="padding:6px 14px;font-size:.8rem" onclick="toast('Opening JWST...');return false">Details</a></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><img src="https://picsum.photos/seed/perseverance-rover/600/440.jpg" alt="Perseverance"><div class="mcard-body"><div class="mcard-date"><i data-lucide="calendar" style="width:13px;height:13px"></i> Jul 2020</div><h5 class="mcard-title">Mars Perseverance</h5><p class="mcard-text">Exploring Jezero Crater, collecting samples, and testing oxygen production.</p></div><div class="mcard-footer"><span class="status on">Collecting</span><a href="#" class="btn btn-ghost" style="padding:6px 14px;font-size:.8rem" onclick="toast('Opening Mars data...');return false">Details</a></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><img src="https://picsum.photos/seed/europa-ice/600/440.jpg" alt="Europa"><div class="mcard-body"><div class="mcard-date"><i data-lucide="calendar" style="width:13px;height:13px"></i> Oct 2024</div><h5 class="mcard-title">Europa Clipper</h5><p class="mcard-text">Investigating Jupiter's icy moon for a subsurface ocean that could harbor life.</p></div><div class="mcard-footer"><span class="status on">In Transit</span><a href="#" class="btn btn-ghost" style="padding:6px 14px;font-size:.8rem" onclick="toast('Opening tracker...');return false">Details</a></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><img src="https://picsum.photos/seed/voyager-golden/600/440.jpg" alt="Voyager"><div class="mcard-body"><div class="mcard-date"><i data-lucide="calendar" style="width:13px;height:13px"></i> Sep 1977</div><h5 class="mcard-title">Voyager 1 & 2</h5><p class="mcard-text">First human objects to enter interstellar space after touring the outer planets.</p></div><div class="mcard-footer"><span class="status done">Interstellar</span><a href="#" class="btn btn-ghost" style="padding:6px 14px;font-size:.8rem" onclick="toast('Opening Voyager...');return false">Details</a></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><img src="https://picsum.photos/seed/psych-asteroid/600/440.jpg" alt="Psyche"><div class="mcard-body"><div class="mcard-date"><i data-lucide="calendar" style="width:13px;height:13px"></i> Oct 2023</div><h5 class="mcard-title">Psyche Mission</h5><p class="mcard-text">Heading to a metal-rich asteroid — possibly the exposed core of a proto-planet.</p></div><div class="mcard-footer"><span class="status on">Cruising</span><a href="#" class="btn btn-ghost" style="padding:6px 14px;font-size:.8rem" onclick="toast('Opening Psyche...');return false">Details</a></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><img src="https://picsum.photos/seed/artemis-moon/600/440.jpg" alt="Artemis"><div class="mcard-body"><div class="mcard-date"><i data-lucide="calendar" style="width:13px;height:13px"></i> 2026</div><h5 class="mcard-title">Artemis Program</h5><p class="mcard-text">Returning humans to the Moon and building the Gateway for deep space access.</p></div><div class="mcard-footer"><span class="status done">In Development</span><a href="#" class="btn btn-ghost" style="padding:6px 14px;font-size:.8rem" onclick="toast('Opening Artemis...');return false">Details</a></div></div></div>
+  </div>
+</div>
+</section>
+
+<!-- Discoveries -->
+<section id="discoveries" style="background:#12121a">
+<div class="container">
+  <div class="text-center mb-5"><div class="stag" style="justify-content:center">Why It Matters</div><h2 class="stitle">Revolutionary Discoveries</h2><p class="sdesc mx-auto">Understanding our place in the cosmos and the physics governing everything.</p></div>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4"><div class="mcard"><div class="mcard-body"><div style="width:44px;height:44px;border-radius:12px;background:rgba(232,168,73,.1);border:1px solid rgba(232,168,73,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px"><i data-lucide="droplets" style="width:20px;height:20px"></i></div><h5 class="mcard-title">Water Beyond Earth</h5><p class="mcard-text">Subsurface oceans on Europa and Enceladus hold more liquid water than all of Earth's oceans combined.</p></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><div class="mcard-body"><div style="width:44px;height:44px;border-radius:12px;background:rgba(232,168,73,.1);border:1px solid rgba(232,168,73,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px"><i data-lucide="atom" style="width:20px;height:20px"></i></div><h5 class="mcard-title">Exoplanet Atmospheres</h5><p class="mcard-text">JWST detected water vapor and CO₂ on distant worlds — even possible biosignatures.</p></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><div class="mcard-body"><div style="width:44px;height:44px;border-radius:12px;background:rgba(232,168,73,.1);border:1px solid rgba(232,168,73,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px"><i data-lucide="waves" style="width:20px;height:20px"></i></div><h5 class="mcard-title">Gravitational Waves</h5><p class="mcard-text">LIGO detects ripples in spacetime from merging black holes billions of light-years away.</p></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><div class="mcard-body"><div style="width:44px;height:44px;border-radius:12px;background:rgba(232,168,73,.1);border:1px solid rgba(232,168,73,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px"><i data-lucide="zap" style="width:20px;height:20px"></i></div><h5 class="mcard-title">Dark Energy</h5><p class="mcard-text">68% of the universe is dark energy — accelerating expansion. We measure it but can't explain it.</p></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><div class="mcard-body"><div style="width:44px;height:44px;border-radius:12px;background:rgba(232,168,73,.1);border:1px solid rgba(232,168,73,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px"><i data-lucide="dna" style="width:20px;height:20px"></i></div><h5 class="mcard-title">Organic Molecules</h5><p class="mcard-text">Amino acids and nucleobases form naturally in interstellar clouds and on asteroid surfaces.</p></div></div></div>
+    <div class="col-md-6 col-lg-4"><div class="mcard"><div class="mcard-body"><div style="width:44px;height:44px;border-radius:12px;background:rgba(232,168,73,.1);border:1px solid rgba(232,168,73,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px"><i data-lucide="clock" style="width:20px;height:20px"></i></div><h5 class="mcard-title">Universe's Age</h5><p class="mcard-text">13.8 billion years old, with the first stars igniting just 100 million years after the Big Bang.</p></div></div></div>
+  </div>
+</div>
+</section>
+
+<!-- Subscribe CTA -->
+<section id="subscribe">
+<div class="container"><div style="background:linear-gradient(135deg,rgba(232,168,73,.08),rgba(232,168,73,.02));border:1px solid rgba(232,168,73,.15);border-radius:20px;padding:50px;text-align:center">
+  <div class="stag" style="justify-content:center">Get Involved</div>
+  <h2 class="stitle mb-3">The Universe Is Calling</h2>
+  <p class="sdesc mx-auto mb-4">Weekly deep-space updates, mission alerts, and exclusive telescope imagery.</p>
+  <form class="d-flex gap-2 justify-content-center flex-wrap" onsubmit="toast('Welcome aboard! 🚀');this.reset();return false" style="max-width:460px;margin:0 auto">
+    <input type="email" required placeholder="Enter your email" class="form-control" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 16px;color:var(--text);flex:1;min-width:200px">
+    <button type="submit" class="btn btn-accent">Subscribe</button>
+  </form>
+  <p style="font-size:.75rem;color:var(--muted);margin:12px 0 0">Join 48,000+ space enthusiasts. No spam.</p>
+</div></div>
+</section>
+
+<!-- Footer -->
+<footer id="footer">
+<div class="container"><div class="row g-4">
+  <div class="col-lg-4"><div style="font-weight:700;font-size:1.15rem;display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="brand-dot"></span>Cosmos</div><p style="color:var(--muted);font-size:.85rem;max-width:280px;line-height:1.6">Exploring the deep universe through data, imagery, and storytelling. Bringing the cosmos closer to everyone.</p></div>
+  <div class="col-6 col-md-3 col-lg-2"><h6>Explore</h6><ul><li><a href="#missions">Missions</a></li><li><a href="#discoveries">Discoveries</a></li><li><a href="#" onclick="toast('Gallery coming soon');return false">Gallery</a></li><li><a href="#" onclick="toast('Timeline coming soon');return false">Timeline</a></li></ul></div>
+  <div class="col-6 col-md-3 col-lg-2"><h6>Resources</h6><ul><li><a href="#" onclick="toast('Opening data...');return false">Open Data</a></li><li><a href="#" onclick="toast('Opening API...');return false">API</a></li><li><a href="#" onclick="toast('Opening edu...');return false">Education</a></li><li><a href="#" onclick="toast('Opening research...');return false">Research</a></li></ul></div>
+  <div class="col-6 col-md-3 col-lg-2"><h6>Company</h6><ul><li><a href="#" onclick="toast('About coming soon');return false">About</a></li><li><a href="#" onclick="toast('Careers coming soon');return false">Careers</a></li><li><a href="#" onclick="toast('Press coming soon');return false">Press</a></li><li><a href="#" onclick="toast('Contact coming soon');return false">Contact</a></li></ul></div>
+  <div class="col-6 col-md-3 col-lg-2"><h6>Legal</h6><ul><li><a href="#" onclick="toast('Privacy loading...');return false">Privacy</a></li><li><a href="#" onclick="toast('Terms loading...');return false">Terms</a></li><li><a href="#" onclick="toast('Cookies...');return false">Cookies</a></li></ul></div>
+</div>
+<div class="fbottom d-flex justify-content-between flex-wrap gap-2"><span>© 2025 Cosmos. Crafted with wonder.</span><span>Made with <span style="color:var(--accent)">♥</span> on Earth</span></div>
+</div>
+</footer>
+
+<!-- Toast -->
+<div class="toast-box" id="tBox"><i data-lucide="rocket" style="width:16px;height:16px;color:var(--accent)"></i><span id="tMsg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+lucide.createIcons();
+const nav=document.getElementById('mainNav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>50));
+let tt;
+function toast(m){const b=document.getElementById('tBox');document.getElementById('tMsg').textContent=m;b.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>b.classList.remove('show'),2500)}
+document.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>{const c=bootstrap.Collapse.getInstance(document.getElementById('navC'));if(c)c.hide()}));
+</script>
+</body>
+</html>
